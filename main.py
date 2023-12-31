@@ -6,7 +6,7 @@ from grade import CalculateGrade
 # Gettig the url and key from the .env file
 load_dotenv(".env")
 url = os.getenv("API_URL")
-key = os.getenv("API_KEY_TEST")
+key = os.getenv("API_KEY")
 
 def main():
     canvas = Canvas(url, key)

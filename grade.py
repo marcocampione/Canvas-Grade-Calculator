@@ -1,21 +1,16 @@
+import sys
 from canvasapi import Canvas,exceptions
 from tqdm import tqdm
 import re 
 from  hints import HINTS
 
 
-# since you have to submit all the flags to pass the course 
-# you can just check if you have submitted all the flags 
-# and with this check we can say that the user has passed the course
-# to check the grade we have to get the information from the group 
-# the use is in
-
-# flags are from 259162 to 259180
-
-
-
+# Since you have to submit all the flags to pass the course, we can just check if you have submitted all the flags 
+# and with this check we can say that the user has passed or not the course. The program will exit if you have not submitted even one of the flags.
+# and will return the flag not submitted.
+# The assignment id for the flags are from 259162 to 259179 that's why I'm iterating over this range. 
+# This function is also generating a dictionary with all the information needed later for the grade calculation
 def check_if_passed(course, user):
-    course_passed = False
     info_dict = {}
 
     for i in tqdm(range(259162, 259180), desc="Checking assignments"):
@@ -39,14 +34,10 @@ def check_if_passed(course, user):
         info_dict[assignment.id] = assignment_info
 
         if submission.workflow_state != 'graded':
-            print(f"You have not submitted the flag {(assignment.name).split()[2]}, so you have not passed the course")
-            return
-        course_passed = True
-        
-        
-    if course_passed:
-        print("You submitted all the flags, so you can pass the course if you have enough points")
-        return info_dict
+            sys.exit(f"You have not submitted the flag {(assignment.name).split()[2]}, so you have not passed the course. Retry next year!")
+    
+    print("You submitted all the flags, so you can pass the course if you have enough points")
+    return info_dict
 
 def user_check_enrollment(canvas):
     try:
@@ -59,22 +50,22 @@ def user_check_enrollment(canvas):
         return 
     return course
 
-def scoreToLetter(score):
-    if 0 <= score <= 180:
-        if score >= 162:
+def points_to_letter_grade(points):
+    if 0 <= points <= 180:
+        if points >= 162:
             return 'A'
-        elif score >= 126:
+        elif points >= 126:
             return 'B'
-        elif score >= 90:
+        elif points >= 90:
             return 'C'
-        elif score >= 54:
+        elif points >= 54:
             return 'D'
-        elif score >= 36:
+        elif points >= 36:
             return 'E'
         else:
             return 'F'
     else:
-        return 'Invalid score'
+        return 'Invalid points'
 
 def max_points_for_assignment(dict_assignments):
     max_points = 0
@@ -116,7 +107,7 @@ def CalculateGrade(canvas):
     # Check if the user has submitted all the flags, and generate a dictionary with all the information
     # needed to do all the calculation later  
     dict_assignments = check_if_passed(course,user)
-
+    
     # Calculate how many points you can get at max for the course
     max_points = max_points_for_assignment(dict_assignments)
 
@@ -131,9 +122,10 @@ def CalculateGrade(canvas):
     # Check if the final grade is above 20% of the total points that are needed to pass the course 
     if final_grade > 0.2 * max_points:
         print('Congratulation!! Your score is above the 20% threshold so you passed the course!')
-        print(f'You got a total of {final_grade} / {max_points} points, you asked {hint_asked} hints to complete the course, your final grade is {scoreToLetter(final_grade)}, ')
+        print(f'You got a total of {final_grade} / {max_points} points, you asked {hint_asked} hints to complete the course, your final grade is {points_to_letter_grade(final_grade)}.')
     else:
-        print(f"Your final points ({final_grade}) are not above 20% of the total points, so you have not passed the course")
+        print('Your score is below the 20% threshold so unfortunately you have not passed the course.')
+        print(f"You got a total of {final_grade} / {max_points} points, you asked {hint_asked} hints, your final grade is {points_to_letter_grade(final_grade)}.")
     
     
 
