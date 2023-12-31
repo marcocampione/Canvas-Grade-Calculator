@@ -9,7 +9,15 @@ from  hints import HINTS
 # and with this check we can say that the user has passed or not the course. The program will exit if you have not submitted even one of the flags.
 # and will return the flag not submitted.
 # The assignment id for the flags are from 259162 to 259179 that's why I'm iterating over this range. 
-# This function is also generating a dictionary with all the information needed later for the grade calculation
+# This function is also generating a dictionary with all the information needed later for the grade calculation, the hints points deduction 
+# for each flag are hard coded in the hints.py file.
+# 
+# The dictionary is in the form of: 
+# {assignment_id: {id: assignment_id, flag_name: flag_name, max_points: max_points, 
+#    submissions: {final_points: final_points, state: state}, 
+#    hints: {hints_points: hints_points}}
+# } 
+
 def check_if_passed(course, user):
     info_dict = {}
 
